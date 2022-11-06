@@ -1,4 +1,7 @@
-.PHONY: pg kafka superset druid down
+.PHONY: pull up logs ps down pg kafka superset druid
+
+clear:
+	echo y | docker image prune --filter="dangling=true"
 
 pull:
 	docker-compose pull

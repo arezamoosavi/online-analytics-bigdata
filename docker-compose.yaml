@@ -19,7 +19,8 @@ services:
   pgworker:
     image: "citusdata/citus:11.1.4"
     labels: [ "com.citusdata.role=Worker" ]
-    depends_on: pgmanager
+    depends_on:
+      - pgmanager
     environment: *AUTH
     command: "/wait-for-manager.sh"
     volumes:
@@ -32,13 +33,18 @@ services:
     volumes:
       - "${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock"
       - healthcheck-volume:/healthcheck
-    depends_on: pg
+    depends_on:
+      - pg
     environment: *AUTH
     restart: unless-stopped
 
   zookeeper:
     container_name: olap-zookeeper
     image: wurstmeister/zookeeper
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     ports:
       - "2181:2181"
     restart: unless-stopped
