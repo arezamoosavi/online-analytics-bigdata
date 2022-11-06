@@ -1,0 +1,85 @@
+version: "3"
+
+services:
+  pg:
+    container_name: olap-citus-master
+    image: "citusdata/citus:11.1.4"
+    ports:
+      - "5432:5432"
+    environment:
+      &AUTH
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+      PGUSER: "postgres"
+      PGPASSWORD: "postgres"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    command: -c fsync=off -c full_page_writes=off
+    restart: unless-stopped
+
+  pgworker:
+    image: "citusdata/citus:11.1.4"
+    labels: [ "com.citusdata.role=Worker" ]
+    depends_on: pgmanager
+    environment: *AUTH
+    command: "/wait-for-manager.sh"
+    volumes:
+      - healthcheck-volume:/healthcheck
+    restart: unless-stopped
+
+  pgmanager:
+    container_name: olap-citus-manager
+    image: "citusdata/membership-manager:0.3.0"
+    volumes:
+      - "${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock"
+      - healthcheck-volume:/healthcheck
+    depends_on: pg
+    environment: *AUTH
+    restart: unless-stopped
+
+  zookeeper:
+    container_name: olap-zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    restart: unless-stopped
+
+  kafka:
+    container_name: olap-kafka
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: "INTERNAL://kafka:9090,EXTERNAL://:9092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:9090,EXTERNAL://localhost:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    restart: unless-stopped
+
+  druid:
+    container_name: olap-druid
+    build: ./containers/druid
+    ports:
+      - 8081:8081
+      - 8082:8082
+      - 8083:8083
+      - 8888:8888
+      - 8090:8090
+    depends_on:
+      - zookeeper
+    restart: unless-stopped
+
+  superset:
+    container_name: olap-superset
+    build: ./containers/superset
+    environment:
+      ADMIN_USERNAME: admin
+      ADMIN_PWD: admin
+    ports:
+      - 8088:8088
+    volumes:
+      - ./containers/superset:/superset
+    restart: unless-stopped
+
+volumes:
+  healthcheck-volume:
