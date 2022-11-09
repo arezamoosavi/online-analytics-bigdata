@@ -19,8 +19,7 @@ object RunStreamer extends App{
       .option("sep", "\t")
       .option("inferSchema", "true")
       .option("header", "true")
-      .load("src/main/resources/user-ct-test-collection.txt")
-
+      .load("sparking/src/main/resources/user-ct-test-collection.txt")
 
 
     raw_df.selectExpr("CAST(AnonID AS STRING) AS key", "to_json(struct(*)) AS value")

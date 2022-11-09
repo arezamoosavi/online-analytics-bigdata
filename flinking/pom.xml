@@ -5,62 +5,87 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>alireza.vi</groupId>
-    <artifactId>online-analytics-bigdata</artifactId>
+    <artifactId>flinking</artifactId>
     <packaging>jar</packaging>
     <version>1.0</version>
 
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <spark.version>3.3.1</spark.version>
-        <kafka.version>3.2.0</kafka.version>
-        <scala.minor.version>2.13</scala.minor.version>
-        <scala.complete.version>${scala.minor.version}.10</scala.complete.version>
-        <slf4j.version>1.7.32</slf4j.version>
+        <flink.version>1.7.1</flink.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <scala.version>2.12.8</scala.version>
     </properties>
 
     <dependencies>
+        <!-- Apache Flink dependencies -->
+        <!-- These dependencies are provided, because they should not be packaged into the JAR file. -->
         <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_${scala.minor.version}</artifactId>
-            <version>${spark.version}</version>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-scala_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_${scala.minor.version}</artifactId>
-            <version>${spark.version}</version>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-scala_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
 
-        <!--spark Streaming kafka-->
+        <!-- Scala Library, provided by Flink as well. -->
         <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql-kafka-0-10_${scala.minor.version}</artifactId>
-            <version>${spark.version}</version>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+            <scope>provided</scope>
         </dependency>
 
-        <!--kafka-->
+        <!-- runtime-web dependency is need to start web UI from IDE -->
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_${scala.minor.version}</artifactId>
-            <version>${kafka.version}</version>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-runtime-web_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
         </dependency>
 
+        <!-- queryable-state dependencies are needed for respective examples -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-queryable-state-runtime_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-queryable-state-client-java_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
         </dependency>
 
+        <!--
+        Derby is used for a sink connector example.
+        Example only works in local mode, i.e, it is not possible to submit it to a running cluster.
+        The dependency is set to provided to reduce the size of the JAR file.
+        -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.13.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -104,4 +129,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
