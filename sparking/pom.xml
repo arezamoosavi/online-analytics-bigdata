@@ -15,6 +15,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <spark.version>3.3.1</spark.version>
         <kafka.version>3.2.0</kafka.version>
+        <postgre.version>42.5.1</postgre.version>
         <scala.minor.version>2.12</scala.minor.version>
         <scala.complete.version>${scala.minor.version}.8</scala.complete.version>
         <slf4j.version>1.7.32</slf4j.version>
@@ -47,6 +48,14 @@
             <artifactId>kafka_${scala.minor.version}</artifactId>
             <version>${kafka.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgre.version}</version>
+        </dependency>
+
 
         <!-- Logging -->
         <dependency>

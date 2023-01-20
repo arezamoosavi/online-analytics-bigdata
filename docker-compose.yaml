@@ -61,6 +61,10 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
     restart: unless-stopped
 
+  kafkacat:
+    image: confluentinc/cp-kafkacat
+    command: sleep infinity
+
   druid:
     container_name: olap-druid
     build: ./containers/druid
@@ -68,7 +72,7 @@ services:
       - 8081:8081
       - 8082:8082
       - 8083:8083
-      - 8888:8888
+      - 8888:8888 #main
       - 8090:8090
     depends_on:
       - zookeeper

@@ -23,6 +23,11 @@ kafka:
 	sleep 3
 	docker-compose up -d kafka
 
+kafkacat:
+	docker-compose up -d kafkacat
+	docker-compose exec kafkacat kafkacat -b kafka:9092 -C -o beginning -t click_topic | jq
+
+
 pg:
 	docker-compose up -d pgworker
 
@@ -33,3 +38,20 @@ druid:
 	docker-compose up -d zookeeper
 	sleep 3
 	docker-compose up -d druid
+
+rm-druid:
+	docker-compose stop druid
+	echo y | docker-compose rm druid
+
+
+# create_table:
+#     create tasble click_events
+#     (
+#     	anon_id text,
+#     	query text,
+#     	query_time text,
+#     	item_rank text,
+#     	click_url text
+#     );
+
+
